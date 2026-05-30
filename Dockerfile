@@ -30,20 +30,15 @@ RUN apt-get update && apt-get install -y \
 RUN pip install poetry \
  && pip install reflex
 
-WORKDIR /app
+WORKDIR /tmp/app
 
 COPY --from=builder /app /app
 
-# 🔥 CLAVE OPENSHIFT FIX
 ENV HOME=/tmp
+ENV TMPDIR=/tmp
 ENV XDG_DATA_HOME=/tmp/.local/share
 ENV REFLEX_DIR=/tmp/reflex
-ENV TMPDIR=/tmp
-
-# ❌ NO useradd (OpenShift rompe esto)
-# USER appuser
 
 EXPOSE 3000
 
-# 🔥 IMPORTANTE: regen clean runtime
-CMD ["bash", "-c", "rm -rf .web && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port"]
+CMD ["bash", "-c", "cd /tmp/app && rm -rf .web && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port"]
