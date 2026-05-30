@@ -19,10 +19,15 @@ RUN reflex compile
 # ======================
 FROM python:3.12-slim
 
-RUN apt-get update && apt-get install -y curl \
- && pip install poetry \
- && pip install reflex \
- && apt-get clean
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    ca-certificates \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN pip install poetry \
+ && pip install reflex
 
 WORKDIR /app
 
