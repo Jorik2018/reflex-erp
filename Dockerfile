@@ -37,4 +37,4 @@ USER appuser
 EXPOSE 3000
 
 # Ejecutar app
-CMD ["reflex", "run", "--env", "prod", "--backend-host", "0.0.0.0", "--frontend-host", "0.0.0.0"]
+CMD ["reflex", "run", "--env", "prod", "--backend-host", "0.0.0.0", "--single-port"]
