@@ -3,23 +3,19 @@ name: Build Reflex App
 on:
   push:
     branches: [ "main" ]
-  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Instalar Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Instalar Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "18"
 
@@ -31,7 +27,7 @@ jobs:
           poetry config virtualenvs.create false
           poetry install
 
-      - name: Compilar app Reflex
+      - name: Compilar Reflex
         run: poetry run reflex compile
 
       - name: Build Docker
