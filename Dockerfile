@@ -4,7 +4,8 @@ FROM python:3.11-slim
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    unzip \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean
 
