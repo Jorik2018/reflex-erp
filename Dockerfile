@@ -30,11 +30,18 @@ RUN rm -rf .web
 # Compilar Reflex
 RUN reflex compile
 
+# ==============================
+# 🔥 FIX OPENSHIFT PERMISSIONS
+# ==============================
+ENV HOME=/tmp
+ENV XDG_DATA_HOME=/tmp/.local/share
+ENV REFLEX_DIR=/tmp/reflex
+
 # Crear usuario (OpenShift requirement)
 RUN useradd -m appuser
+
 USER appuser
 
 EXPOSE 3000
 
-# Ejecutar app
 CMD ["reflex", "run", "--env", "prod", "--backend-host", "0.0.0.0", "--single-port"]
