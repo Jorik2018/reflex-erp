@@ -1,6 +1,8 @@
 FROM python:3.12-slim AS builder
 
-RUN apt-get update && apt-get install -y curl build-essential unzip
+RUN apt-get update && apt-get install -y \
+    curl build-essential unzip \
+ && rm -rf /var/lib/apt/lists/*
 
 RUN pip install poetry
 
@@ -9,36 +11,45 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock* ./
 
 RUN poetry config virtualenvs.create false \
- && poetry install --no-root
+ && poetry install --no-interaction --no-ansi --no-root
 
 COPY . .
+
+# (opcional pero recomendado)
+RUN reflex compile || true
 
 
 # ======================
 FROM python:3.12-slim
 
 RUN apt-get update && apt-get install -y \
-    curl \
-    unzip \
-    ca-certificates \
- && apt-get clean \
+    curl unzip ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
-RUN pip install poetry \
- && pip install reflex
+RUN pip install poetry reflex
 
-# 🔥 CLAVE REAL: todo en /tmp
-WORKDIR /tmp/app
+WORKDIR /app
 
-COPY --from=builder /app /tmp/app
+COPY --from=builder /app /app
 
+# 🔥 OpenShift-safe writable dirs
 ENV HOME=/tmp
 ENV TMPDIR=/tmp
 ENV XDG_DATA_HOME=/tmp/.local/share
 ENV REFLEX_DIR=/tmp/reflex
-ENV REFLUX_DIR=/tmp/reflex
-ENV PYTHONUSERBASE=/tmp/python
+
+# 🔥 CLAVE: evita conflictos de .web en root del repo
+ENV REFLEX_WORKDIR=/tmp/app
+RUN mkdir -p /tmp/app
+
+WORKDIR /app
 
 EXPOSE 3000
 
-CMD ["bash", "-c", "mkdir -p /tmp/work && cd /tmp/work && export HOME=/tmp && export TMPDIR=/tmp && cp -r /tmp/app/* . && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port --loglevel debug"]
+CMD ["bash", "-c", "\
+export HOME=/tmp && \
+export TMPDIR=/tmp && \
+export REFLEX_DIR=/tmp/reflex && \
+cd /app && \
+reflex run --env prod --backend-host 0.0.0.0 --single-port --loglevel debug \
+"]
