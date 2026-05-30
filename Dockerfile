@@ -13,7 +13,8 @@ RUN poetry config virtualenvs.create false \
 
 COPY . .
 
-RUN reflex compile
+# ❌ NO compiles aquí (esto te rompe permisos)
+# RUN reflex compile
 
 
 # ======================
@@ -33,19 +34,16 @@ WORKDIR /app
 
 COPY --from=builder /app /app
 
+# 🔥 CLAVE OPENSHIFT FIX
 ENV HOME=/tmp
 ENV XDG_DATA_HOME=/tmp/.local/share
 ENV REFLEX_DIR=/tmp/reflex
-ENV PATH="/root/.local/bin:$PATH"
+ENV TMPDIR=/tmp
 
-# OpenShift-safe user
-RUN useradd -m appuser
-
-# dar ownership al app
-RUN chown -R appuser:appuser /app /tmp
-
-USER appuser
+# ❌ NO useradd (OpenShift rompe esto)
+# USER appuser
 
 EXPOSE 3000
 
-CMD ["poetry", "run", "reflex", "run", "--env", "prod", "--backend-host", "0.0.0.0", "--single-port"]
+# 🔥 IMPORTANTE: regen clean runtime
+CMD ["bash", "-c", "rm -rf .web && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port"]
