@@ -27,9 +27,10 @@ RUN apt-get update && apt-get install -y \
 RUN pip install poetry \
  && pip install reflex
 
-WORKDIR /app
+# 🔥 CLAVE REAL: todo en /tmp
+WORKDIR /tmp/app
 
-COPY --from=builder /app /app
+COPY --from=builder /app /tmp/app
 
 ENV HOME=/tmp
 ENV TMPDIR=/tmp
@@ -38,4 +39,4 @@ ENV REFLEX_DIR=/tmp/reflex
 
 EXPOSE 3000
 
-CMD ["bash", "-c", "cd /app && rm -rf .web && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port"]
+CMD ["bash", "-c", "cd /tmp/app && rm -rf .web && export HOME=/tmp && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port"]
