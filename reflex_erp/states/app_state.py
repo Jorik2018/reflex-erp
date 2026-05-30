@@ -1,7 +1,7 @@
 import reflex as rx
 from typing import TypedDict
 #from faker import Faker
-from reflex_erp.db import collection
+from reflex_erp.db import get_employee_collection
 
 # Setup faker for beautiful mock data
 #fake = Faker()
@@ -25,14 +25,14 @@ class AppState(rx.State):
     new_item: str = ""
 
     def load_items(self):
-        self.items = [str(item["name"]) for item in collection.find()]
+        self.items = [str(item["name"]) for item in get_employee_collection().find()]
 
     def set_new_item(self, value: str):
         self.new_item = value
 
     def add_item(self):
         if self.new_item:
-            collection.insert_one({"name": self.new_item})
+            get_employee_collection().insert_one({"name": self.new_item})
             self.new_item = ""
             self.load_items()
 

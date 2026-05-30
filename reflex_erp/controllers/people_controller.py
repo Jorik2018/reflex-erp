@@ -1,14 +1,22 @@
 import reflex as rx
 from fastapi import FastAPI, Depends
 from fastapi.security import OAuth2PasswordBearer
-from reflex_erp.db import collection
+from reflex_erp.db import get_db
 
 # Create a FastAPI app with authentication
 fastapi_app = FastAPI(title="Secure API")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+def get_employee_collection(db=Depends(get_db)):
+    if db is None:
+        return None
+    return db["employee"]
+
 @fastapi_app.get("/api/people")
-async def get_items():
+async def get_items(collection=Depends(get_employee_collection)):
+    if collection is None:
+        return []  # modo CI / compile
+
     return [
         {**item, "_id": str(item["_id"])}
         for item in collection.find()
