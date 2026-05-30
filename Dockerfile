@@ -41,4 +41,4 @@ ENV PYTHONUSERBASE=/tmp/python
 
 EXPOSE 3000
 
-CMD ["bash", "-c", "cd /tmp/app && export HOME=/tmp && export TMPDIR=/tmp && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port --loglevel debug"]
+CMD ["bash", "-c", "mkdir -p /tmp/work && cd /tmp/work && export HOME=/tmp && export TMPDIR=/tmp && cp -r /tmp/app/* . && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port --loglevel debug"]
