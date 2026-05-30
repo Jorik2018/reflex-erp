@@ -1,0 +1,23 @@
+[project]
+name = "reflex-erp"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "jorik2018",email = "antoniopinedo2018@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "reflex (>=0.9.3,<0.10.0)",
+    "pymongo (>=4.17.0,<5.0.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)",
+    "fastapi (>=0.136.3,<0.137.0)"
+]
+
+[tool.poetry]
+packages = [{include = "reflex_erp", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
