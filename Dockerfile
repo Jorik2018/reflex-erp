@@ -36,7 +36,9 @@ ENV HOME=/tmp
 ENV TMPDIR=/tmp
 ENV XDG_DATA_HOME=/tmp/.local/share
 ENV REFLEX_DIR=/tmp/reflex
+ENV REFLUX_DIR=/tmp/reflex
+ENV PYTHONUSERBASE=/tmp/python
 
 EXPOSE 3000
 
-CMD ["bash", "-c", "cd /tmp/app && rm -rf .web && export HOME=/tmp && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port"]
+CMD ["bash", "-c", "cd /tmp/app && export HOME=/tmp && export TMPDIR=/tmp && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port --loglevel debug"]
