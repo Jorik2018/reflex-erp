@@ -13,9 +13,6 @@ RUN poetry config virtualenvs.create false \
 
 COPY . .
 
-# ❌ NO compiles aquí (esto te rompe permisos)
-# RUN reflex compile
-
 
 # ======================
 FROM python:3.12-slim
@@ -30,7 +27,7 @@ RUN apt-get update && apt-get install -y \
 RUN pip install poetry \
  && pip install reflex
 
-WORKDIR /tmp/app
+WORKDIR /app
 
 COPY --from=builder /app /app
 
@@ -41,4 +38,4 @@ ENV REFLEX_DIR=/tmp/reflex
 
 EXPOSE 3000
 
-CMD ["bash", "-c", "cd /tmp/app && rm -rf .web && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port"]
+CMD ["bash", "-c", "cd /app && rm -rf .web && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port"]
