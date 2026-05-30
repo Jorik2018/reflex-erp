@@ -1,34 +1,35 @@
-FROM python:3.11-slim
+FROM python:3.11-slim AS builder
 
-RUN apt-get update && apt-get install -y \
-    curl build-essential unzip \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get clean
+RUN apt-get update && apt-get install -y curl build-essential unzip
 
 RUN pip install poetry
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock* /app/
-
+COPY pyproject.toml poetry.lock* ./
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --no-root
+ && poetry install --no-root
 
-COPY . /app
+COPY . .
 
-# =========================
-# FIX OPENSHIFT PERMISSIONS
-# =========================
+RUN reflex compile
+
+
+# ======================
+FROM python:3.11-slim
+
+RUN pip install poetry
+
+WORKDIR /app
+
+COPY --from=builder /app /app
+
 ENV HOME=/tmp
 ENV XDG_DATA_HOME=/tmp/.local/share
 ENV REFLEX_DIR=/tmp/reflex
 
 RUN useradd -m appuser
 USER appuser
-
-# 🔥 IMPORTANT: compile AFTER user switch
-RUN rm -rf .web && reflex compile
 
 EXPOSE 3000
 
