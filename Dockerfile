@@ -1,4 +1,4 @@
-FROM python:3.11-slim AS builder
+FROM python:3.12-slim AS builder
 
 RUN apt-get update && apt-get install -y curl build-essential unzip
 
@@ -16,7 +16,7 @@ RUN reflex compile
 
 
 # ======================
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 RUN pip install poetry
 
