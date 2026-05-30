@@ -1,23 +1,42 @@
-[project]
-name = "reflex-erp"
-version = "0.1.0"
-description = ""
-authors = [
-    {name = "jorik2018",email = "antoniopinedo2018@gmail.com"}
-]
-readme = "README.md"
-requires-python = ">=3.12,<4.0"
-dependencies = [
-    "reflex (>=0.9.3,<0.10.0)",
-    "pymongo (>=4.17.0,<5.0.0)",
-    "python-dotenv (>=1.2.2,<2.0.0)",
-    "fastapi (>=0.136.3,<0.137.0)"
-]
+FROM python:3.12-slim AS builder
 
-#[tool.poetry]
-#packages = [{include = "reflex_erp", from = "src"}]
+RUN apt-get update && apt-get install -y curl build-essential unzip
+
+RUN pip install poetry
+
+WORKDIR /app
+
+COPY pyproject.toml poetry.lock* ./
+
+RUN poetry config virtualenvs.create false \
+ && poetry install --no-root
+
+COPY . .
 
 
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+# ======================
+FROM python:3.12-slim
+
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    ca-certificates \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN pip install poetry \
+ && pip install reflex
+
+# 🔥 CLAVE REAL: todo en /tmp
+WORKDIR /tmp/app
+
+COPY --from=builder /app /tmp/app
+
+ENV HOME=/tmp
+ENV TMPDIR=/tmp
+ENV XDG_DATA_HOME=/tmp/.local/share
+ENV REFLEX_DIR=/tmp/reflex
+
+EXPOSE 3000
+
+CMD ["bash", "-c", "cd /tmp/app && rm -rf .web && export HOME=/tmp && poetry run reflex run --env prod --backend-host 0.0.0.0 --single-port"]
